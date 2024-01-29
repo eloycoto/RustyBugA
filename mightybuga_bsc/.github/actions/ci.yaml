@@ -1,0 +1,36 @@
+name: Build
+on:
+  push:
+    branches:
+      - main
+      - Actions
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Rust
+        uses: actions/setup-rust@v2
+        with:
+          toolchain: stable
+
+      - name: Install dependencies
+        run: |
+          rustup component add llvm-tools-preview
+          rustup target add thumbv7m-none-eabi
+          cargo install cargo-binutils cargo-embed cargo-flash cargo-expand
+          cargo install cargo-generate
+
+      - name: Build
+        run: |
+          cd mightybuga_bsc
+          cargo build
+
+      - name: test
+        run: |
+          cd ../tests/
+          cargo tests
